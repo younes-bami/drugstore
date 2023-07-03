@@ -1,6 +1,6 @@
 // services/drugstoreService.js
 const Drugstore = require('../models/Drugstore');
-const redis = require('../redis');
+const redis = require('../config/redis');
 
 const getDrugstores = async () => {
   try {
