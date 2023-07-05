@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
+import PropTypes from 'prop-types';
 
 const DrugstoreMap = ({ userLocation, drugstores }) => {
   const mapRef = useRef(null);
@@ -41,4 +42,20 @@ const DrugstoreMap = ({ userLocation, drugstores }) => {
   return <div id="map" style={{ height: '100%' }}></div>;
 };
 
-export default DrugstoreMap;
+DrugstoreMap.propTypes = {
+    userLocation: PropTypes.shape({
+      lat: PropTypes.number,
+      lng: PropTypes.number,
+    }).isRequired,
+    drugstores: PropTypes.arrayOf(
+      PropTypes.shape({
+        coordinates: PropTypes.shape({
+          latitude: PropTypes.number,
+          longitude: PropTypes.number,
+        }),
+        name: PropTypes.string,
+      })
+    ).isRequired,
+  };
+  
+  export default DrugstoreMap;

@@ -1,7 +1,6 @@
-// components/ListView/DrugstoreList.js
-
 import React from 'react';
 import { Card, CardContent, Typography, makeStyles } from '@material-ui/core';
+import PropTypes from 'prop-types';
 
 const useStyles = makeStyles((theme) => ({
   drugstoreCard: {
@@ -30,6 +29,17 @@ const DrugstoreList = ({ drugstores }) => {
       ))}
     </div>
   );
+};
+
+DrugstoreList.propTypes = {
+  drugstores: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string,
+      address: PropTypes.string,
+      city: PropTypes.string,
+      neighborhood: PropTypes.string,
+    })
+  ).isRequired,
 };
 
 export default DrugstoreList;

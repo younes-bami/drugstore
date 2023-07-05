@@ -13,7 +13,7 @@ const App = () => {
   const drugstores = useSelector((state) => state.drugstores.drugstores);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredDrugstores, setFilteredDrugstores] = useState([]);
-  const userLocation = useUserLocation();
+  const { location: userLocation, error: locationError } = useUserLocation();
 
   useEffect(() => {
     if (userLocation) {
@@ -36,6 +36,7 @@ const App = () => {
     <div className="App">
       <ErrorBoundary>
         <SearchBar onSearchChange={(query) => setSearchQuery(query)} />
+        {locationError && <div className="error">{locationError}</div>}
         <div className="content-row">
           {userLocation && <DrugstoreMap userLocation={userLocation} drugstores={filteredDrugstores} />}
           <DrugstoreList drugstores={filteredDrugstores} />

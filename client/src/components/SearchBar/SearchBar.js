@@ -1,7 +1,6 @@
-// components/SearchBar/SearchBar.js
-
 import React from 'react';
 import { TextField, makeStyles } from '@material-ui/core';
+import PropTypes from 'prop-types';
 
 const useStyles = makeStyles((theme) => ({
   searchBar: {
@@ -9,7 +8,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SearchBar = ({ onSearchChange }) => {
+const SearchBar =({ onSearchChange }) => {
   const classes = useStyles();
 
   const handleSearchChange = (event) => {
@@ -25,6 +24,10 @@ const SearchBar = ({ onSearchChange }) => {
       onChange={handleSearchChange}
     />
   );
+};
+
+SearchBar.propTypes = {
+  onSearchChange: PropTypes.func.isRequired,
 };
 
 export default SearchBar;

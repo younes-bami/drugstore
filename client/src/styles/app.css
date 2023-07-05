@@ -56,3 +56,10 @@ body, html {
     transform: scale(1.1);
     box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
 }
+/* ... existing styles ... */
+
+.error {
+    color: red;
+    text-align: center;
+    margin: 10px;
+}
