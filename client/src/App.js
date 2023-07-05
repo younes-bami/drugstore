@@ -24,13 +24,14 @@ const App = () => {
   useEffect(() => {
     const query = searchQuery.toLowerCase();
     const filtered = drugstores.filter((drugstore) =>
-      drugstore.name.toLowerCase().includes(query) ||
-      drugstore.address.toLowerCase().includes(query) ||
-      drugstore.city.toLowerCase().includes(query) ||
-      drugstore.neighborhood.toLowerCase().includes(query)
+      drugstore.name?.toLowerCase().includes(query) ||
+      drugstore.address?.toLowerCase().includes(query) ||
+      drugstore.city?.toLowerCase().includes(query) ||
+      drugstore.neighborhood?.toLowerCase().includes(query)
     );
     setFilteredDrugstores(filtered);
   }, [searchQuery, drugstores]);
+  
 
   return (
     <div className="App">
