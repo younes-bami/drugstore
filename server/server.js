@@ -22,25 +22,23 @@ connectDB();
 app.use('/api', drugstoreRoutes);
 app.use(errorMiddleware);
 
-
 // Swagger setup
 const options = {
-    swaggerDefinition,
-    apis: ['./routes/*.js'], // path to the API docs
-  };
-  
-  const swaggerSpec = swaggerJsdoc(options);
-  
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  swaggerDefinition,
+  apis: ['./routes/*.js'], // path to the API docs
+};
 
+const swaggerSpec = swaggerJsdoc(options);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Export your app
 module.exports = app;
 
 // Start your server only if this file is run directly
 if (require.main === module) {
-    const PORT = process.env.PORT || 3001;
-    app.listen(PORT, () => {
-      console.log(`Server listening on port ${PORT}`);
-    });
-  }
+  const PORT = process.env.PORT || 3001;
+  app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
+  });
+}

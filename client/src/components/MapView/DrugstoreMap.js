@@ -9,14 +9,14 @@ const DrugstoreMap = ({ userLocation, drugstores }) => {
     if (userLocation && userLocation.lat && userLocation.lng) {
       // Check if the map is already initialized
       if (!mapRef.current) {
-        // Initialize the map
-        mapRef.current = L.map('map').setView([userLocation.lat, userLocation.lng], 13);
+        // Initialize the map with a zoom level of 14 for a 3km radius
+        mapRef.current = L.map('map').setView([userLocation.lat, userLocation.lng], 15);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           maxZoom: 19,
         }).addTo(mapRef.current);
       } else {
-        // Update the map view
-        mapRef.current.setView([userLocation.lat, userLocation.lng], 13);
+        // Update the map view with a zoom level of 13 for a 3km radius
+        mapRef.current.setView([userLocation.lat, userLocation.lng], 15);
       }
 
       // Add a marker for the user's current location
@@ -43,19 +43,19 @@ const DrugstoreMap = ({ userLocation, drugstores }) => {
 };
 
 DrugstoreMap.propTypes = {
-    userLocation: PropTypes.shape({
-      lat: PropTypes.number,
-      lng: PropTypes.number,
-    }).isRequired,
-    drugstores: PropTypes.arrayOf(
-      PropTypes.shape({
-        coordinates: PropTypes.shape({
-          latitude: PropTypes.number,
-          longitude: PropTypes.number,
-        }),
-        name: PropTypes.string,
-      })
-    ).isRequired,
-  };
-  
-  export default DrugstoreMap;
+  userLocation: PropTypes.shape({
+    lat: PropTypes.number,
+    lng: PropTypes.number,
+  }).isRequired,
+  drugstores: PropTypes.arrayOf(
+    PropTypes.shape({
+      coordinates: PropTypes.shape({
+        latitude: PropTypes.number,
+        longitude: PropTypes.number,
+      }),
+      name: PropTypes.string,
+    })
+  ).isRequired,
+};
+
+export default DrugstoreMap;

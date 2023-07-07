@@ -1,3 +1,4 @@
+// App.js
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import DrugstoreList from './components/ListView/DrugstoreList';
@@ -16,10 +17,12 @@ const App = () => {
   const { location: userLocation, error: locationError } = useUserLocation();
 
   useEffect(() => {
-    if (userLocation) {
-      dispatch(fetchDrugstores());
+
+    if (userLocation && userLocation.lat && userLocation.lng) {
+      dispatch(fetchDrugstores(userLocation.lat,userLocation.lng));
     }
   }, [dispatch, userLocation]);
+  
 
   useEffect(() => {
     const query = searchQuery.toLowerCase();
@@ -31,7 +34,6 @@ const App = () => {
     );
     setFilteredDrugstores(filtered);
   }, [searchQuery, drugstores]);
-  
 
   return (
     <div className="App">
