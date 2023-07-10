@@ -1,34 +1,70 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import L from 'leaflet';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 
-const DrugstoreMap = ({ userLocation, drugstores }) => {
+const DrugstoreMap = ({ userLocation }) => {
   const mapRef = useRef(null);
+  const [mapRadius, setMapRadius] = useState(2); // Default radius in km
+  const [drugstores, setDrugstores] = useState([]); // State for drugstores
+
+  const fetchDrugstores = useCallback((radius) => {
+    axios.get(`http://localhost:3001/api/drugstores?lat=${userLocation.lat}&lng=${userLocation.lng}&radius=${radius}`)
+    .then(response => {
+        // Update the state with the new data
+        setDrugstores(response.data);
+      })
+      .catch(error => {
+        // Handle the error here
+        console.error(error);
+      });
+  }, [userLocation]);
 
   useEffect(() => {
     if (userLocation && userLocation.lat && userLocation.lng) {
       // Check if the map is already initialized
       if (!mapRef.current) {
-        // Initialize the map with a zoom level of 14 for a 3km radius
+        // Initialize the map with a zoom level of 15 for a 2km radius
         mapRef.current = L.map('map').setView([userLocation.lat, userLocation.lng], 15);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           maxZoom: 19,
         }).addTo(mapRef.current);
-      } else {
-        // Update the map view with a zoom level of 13 for a 3km radius
-        mapRef.current.setView([userLocation.lat, userLocation.lng], 15);
+
+        // Add event listener for when the user finishes panning/zooming
+        mapRef.current.on('moveend', () => {
+          const center = mapRef.current.getCenter();
+          const bounds = mapRef.current.getBounds();
+          const edgePoint = new L.LatLng(center.lat, bounds.getEast());
+          const radius = center.distanceTo(edgePoint) / 1000; // Convert to km
+          setMapRadius(radius);
+          fetchDrugstores(radius);
+        });
+
+        // Perform an initial fetch of drugstores
+        fetchDrugstores(mapRadius);
       }
+    }
+  }, [userLocation, fetchDrugstores, mapRadius]);
 
-      // Add a marker for the user's current location
-      L.marker([userLocation.lat, userLocation.lng]).addTo(mapRef.current).bindPopup('You are here');
-
+  useEffect(() => {
+    if (mapRef.current) {
       // Custom icon for drugstore markers
       const drugstoreIcon = L.icon({
-        iconUrl: 'https://png2.cleanpng.com/sh/a781734db37c12d5f3721ce29381d632/L0KzQYm3UsA1N5J7fZH0aYP2gLBuTgBpaaNyedVELYP8fbP2jL1kdJp1RdN7dD3kcrF5ifdqdpJxRdV1aYDkgsW0VfE4P2E8SKNuNki8coa1V8YxOGo9S6Q6NUG6R4a3UME4QWU5S5D5bne=/kisspng-pharmacy-symbol-clip-art-aboriginal-clipart-5a770701e689b5.7600983215177500179443.png', // Replace this URL with the actual URL of the green cross icon
+        iconUrl: 'https://png2.cleanpng.com/sh/a781734db37c12d5f3721ce29381d632/L0KzQYm3UsA1N5J7fZH0aYP2gLBuTgBpaaNyedVELYP8fbP2jL1kdJp1RdN7dD3kcrF5ifdqdpJxRdV1aYDkgsW0VfE4P2E8SKNuNki8coa1V8YxOGo9S6Q6NUG6R4a3UME4QWU5S5D5bne=/kisspng-pharmacy-symbol-clip-art-aboriginal-clipart-5a770701e689b5.7600983215177500179443.png', // Replace this URL with the actual URL of the icon
         iconSize: [25, 41],
         iconAnchor: [12, 41],
         popupAnchor: [0, -41]
       });
+
+      // Clear existing markers
+      mapRef.current.eachLayer((layer) => {
+        if (layer instanceof L.Marker) {
+          mapRef.current.removeLayer(layer);
+        }
+      });
+
+      // Add a marker for the user's current location
+      L.marker([userLocation.lat, userLocation.lng]).addTo(mapRef.current).bindPopup('You are here');
 
       // Add drugstores markers to map
       drugstores.forEach(drugstore => {
@@ -37,9 +73,11 @@ const DrugstoreMap = ({ userLocation, drugstores }) => {
         }
       });
     }
-  }, [userLocation, drugstores]);
+  }, [drugstores, userLocation]);
 
-  return <div id="map" style={{ height: '100%' }}></div>;
+  console.log(`Map radius: ${mapRadius} km`);
+
+  return <div id='map' style={{ height: '100%' }}></div>;
 };
 
 DrugstoreMap.propTypes = {
@@ -47,15 +85,6 @@ DrugstoreMap.propTypes = {
     lat: PropTypes.number,
     lng: PropTypes.number,
   }).isRequired,
-  drugstores: PropTypes.arrayOf(
-    PropTypes.shape({
-      coordinates: PropTypes.shape({
-        latitude: PropTypes.number,
-        longitude: PropTypes.number,
-      }),
-      name: PropTypes.string,
-    })
-  ).isRequired,
 };
 
 export default DrugstoreMap;

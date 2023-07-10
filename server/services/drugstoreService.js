@@ -1,9 +1,8 @@
 const Drugstore = require('../models/Drugstore');
 const redis = require('../config/redis');
 
-const getDrugstores = async (userLatitude, userLongitude) => {
+const getDrugstores = async (userLatitude, userLongitude, radius) => {
   let drugstores;
-
   try {
     // Try fetching the data from Redis first
     const cachedData = await redis.get('drugstores');
@@ -21,19 +20,20 @@ const getDrugstores = async (userLatitude, userLongitude) => {
     console.error(`Redis Error: ${err.message}`);
   }
 
-  // Filter drugstores within 500 meters
+  // Filter drugstores within the specified radius
   const nearbyDrugstores = drugstores.filter(drugstore => {
+
     const distance = haversineDistance(
       userLatitude,
       userLongitude,
       drugstore.coordinates.latitude,
       drugstore.coordinates.longitude
     );
-    // console.log(`Distance to drugstore ${drugstore.name}: ${distance} km`); // Log distance to each drugstore
-    return distance <= 2; // 2000 meters or 0.5 kilometers
+    console.log ("radius :" + radius);
+    return distance <= radius; // Filter by the specified radius
   });
 
-  console.log(`Filtered ${nearbyDrugstores.length} drugstores within 500 meters`); // Log filtered drugstores
+  console.log(`Filtered ${nearbyDrugstores.length} drugstores within ${radius} km`); // Log filtered drugstores
 
   return nearbyDrugstores;
 };

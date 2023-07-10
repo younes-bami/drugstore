@@ -4,11 +4,18 @@ const logger = require('../config/logger');
 const getDrugstores = async (req, res) => {
   const userLatitude = parseFloat(req.query.lat);
   const userLongitude = parseFloat(req.query.lng);
+  let radius = parseFloat(req.query.radius);
 
-  logger.info(`User location received: Latitude: ${userLatitude}, Longitude: ${userLongitude}`); // Log with Winston
+    // Check if radius is a valid number
+    if (isNaN(radius)) {
+      console.error('Invalid radius parameter');
+      radius = 2; // Set a default radius if the parameter is invalid
+    }
+
+  logger.info(`User location received: Latitude: ${userLatitude}, Longitude: ${userLongitude}, Radius: ${radius} km`); // Log with Winston
   
   try {
-    const drugstores = await drugstoreService.getDrugstores(userLatitude, userLongitude); // Pass userLatitude and userLongitude
+    const drugstores = await drugstoreService.getDrugstores(userLatitude, userLongitude, radius); // Pass userLatitude, userLongitude and radius
     logger.info(`Fetched ${drugstores.length} drugstores`); // Log with Winston
     res.json(drugstores);
   } catch (err) {
