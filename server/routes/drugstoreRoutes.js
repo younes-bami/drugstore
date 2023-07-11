@@ -15,7 +15,7 @@ const { validateDrugstore } = require('../middleware/drugstoreValidator');
  *       200:
  *         description: A list of drugstores.
  */
-
-router.get('/drugstores', drugstoreController.getDrugstores);
+console.log("router");
+router.get('/drugstores' , drugstoreController.getDrugstores);
 
 module.exports = router;
