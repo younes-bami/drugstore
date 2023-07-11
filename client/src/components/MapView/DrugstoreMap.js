@@ -5,10 +5,11 @@ import axios from 'axios';
 
 const DrugstoreMap = ({ userLocation, setDrugstores, drugstores }) => {
   const mapRef = useRef(null);
+  const [mapCenter, setMapCenter] = useState(userLocation);
   const [mapRadius, setMapRadius] = useState(2); // Default radius in km
 
-  const fetchDrugstores = useCallback((radius) => {
-    axios.get(`http://localhost:3001/api/drugstores?lat=${userLocation.lat}&lng=${userLocation.lng}&radius=${radius}`)
+  const fetchDrugstores = useCallback((center, radius) => {
+    axios.get(`http://localhost:3001/api/drugstores?lat=${center.lat}&lng=${center.lng}&radius=${radius}`)
     .then(response => {
         // Update the state with the new data
         setDrugstores(response.data);
@@ -17,14 +18,14 @@ const DrugstoreMap = ({ userLocation, setDrugstores, drugstores }) => {
         // Handle the error here
         console.error(error);
       });
-  }, [userLocation, setDrugstores]);
+  }, [setDrugstores]);
 
   useEffect(() => {
-    if (userLocation && userLocation.lat && userLocation.lng) {
+    if (mapCenter && mapCenter.lat && mapCenter.lng) {
       // Check if the map is already initialized
       if (!mapRef.current) {
         // Initialize the map with a zoom level of 15 for a 2km radius
-        mapRef.current = L.map('map').setView([userLocation.lat, userLocation.lng], 15);
+        mapRef.current = L.map('map').setView([mapCenter.lat, mapCenter.lng], 15);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           maxZoom: 19,
         }).addTo(mapRef.current);
@@ -35,15 +36,16 @@ const DrugstoreMap = ({ userLocation, setDrugstores, drugstores }) => {
           const bounds = mapRef.current.getBounds();
           const edgePoint = new L.LatLng(center.lat, bounds.getEast());
           const radius = center.distanceTo(edgePoint) / 1000; // Convert to km
+          setMapCenter(center);
           setMapRadius(radius);
-          fetchDrugstores(radius);
+          fetchDrugstores(center, radius);
         });
 
         // Perform an initial fetch of drugstores
-        fetchDrugstores(mapRadius);
+        fetchDrugstores(mapCenter, mapRadius);
       }
     }
-  }, [userLocation, fetchDrugstores, mapRadius]);
+  }, [mapCenter, fetchDrugstores, mapRadius]);
 
   useEffect(() => {
     if (mapRef.current && drugstores) {
