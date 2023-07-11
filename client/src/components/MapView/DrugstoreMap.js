@@ -3,10 +3,9 @@ import L from 'leaflet';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 
-const DrugstoreMap = ({ userLocation }) => {
+const DrugstoreMap = ({ userLocation, setDrugstores, drugstores }) => {
   const mapRef = useRef(null);
   const [mapRadius, setMapRadius] = useState(2); // Default radius in km
-  const [drugstores, setDrugstores] = useState([]); // State for drugstores
 
   const fetchDrugstores = useCallback((radius) => {
     axios.get(`http://localhost:3001/api/drugstores?lat=${userLocation.lat}&lng=${userLocation.lng}&radius=${radius}`)
@@ -18,7 +17,7 @@ const DrugstoreMap = ({ userLocation }) => {
         // Handle the error here
         console.error(error);
       });
-  }, [userLocation]);
+  }, [userLocation, setDrugstores]);
 
   useEffect(() => {
     if (userLocation && userLocation.lat && userLocation.lng) {
@@ -47,7 +46,7 @@ const DrugstoreMap = ({ userLocation }) => {
   }, [userLocation, fetchDrugstores, mapRadius]);
 
   useEffect(() => {
-    if (mapRef.current) {
+    if (mapRef.current && drugstores) {
       // Custom icon for drugstore markers
       const drugstoreIcon = L.icon({
         iconUrl: 'https://png2.cleanpng.com/sh/a781734db37c12d5f3721ce29381d632/L0KzQYm3UsA1N5J7fZH0aYP2gLBuTgBpaaNyedVELYP8fbP2jL1kdJp1RdN7dD3kcrF5ifdqdpJxRdV1aYDkgsW0VfE4P2E8SKNuNki8coa1V8YxOGo9S6Q6NUG6R4a3UME4QWU5S5D5bne=/kisspng-pharmacy-symbol-clip-art-aboriginal-clipart-5a770701e689b5.7600983215177500179443.png', // Replace this URL with the actual URL of the icon
@@ -85,6 +84,8 @@ DrugstoreMap.propTypes = {
     lat: PropTypes.number,
     lng: PropTypes.number,
   }).isRequired,
+  setDrugstores: PropTypes.func.isRequired,
+  drugstores: PropTypes.array,
 };
 
 export default DrugstoreMap;
